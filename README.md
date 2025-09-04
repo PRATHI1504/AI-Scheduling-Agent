@@ -3,17 +3,19 @@
 A form-based AI scheduling system built with Python + Streamlit to manage clinic appointments.
 It captures patient details, checks schedules, books appointments, and sends simulated confirmations & reminders.
 
+
 🚀 Features
 
-📋 Patient Form – Collects name, DOB, contact, insurance details.
+Patient Form – Collects name, DOB, contact, insurance details.
 
-🩺 Doctor Selection – Choose doctor, date, time, and duration.
+Doctor Selection – Choose doctor, date, time, and duration.
 
-✅ Booking System – Prevents double-booking, saves appointments.
+Booking System – Prevents double-booking, saves appointments.
 
-📧 Confirmations & Reminders – Simulated via CSV log.
+Confirmations & Reminders – Simulated via CSV log.
 
-📊 Admin Dashboard – View patients, schedules, confirmed appointments, and communication logs.
+Admin Dashboard – View patients, schedules, confirmed appointments, and communication logs.
+
 
 🛠️ Tech Stack
 
