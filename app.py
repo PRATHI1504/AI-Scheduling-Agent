@@ -50,8 +50,8 @@ def ensure_seed_data():
                     slots.append({
                         "doctor": d["doctor"],
                         "location": d["location"],
-                        "start": s.isoformat(),
-                        "end": e.isoformat(),
+                        "start": s,
+                        "end": e,
                         "booked": False,
                         "patient_id": "",
                     })
@@ -64,7 +64,11 @@ def save_patients(df):
     df.to_csv(PATIENTS_CSV, index=False)
 
 def load_schedule():
-    return pd.read_excel(SCHEDULE_XLSX)
+    df = pd.read_excel(SCHEDULE_XLSX)
+    # Ensure datetime conversion
+    df["start"] = pd.to_datetime(df["start"])
+    df["end"] = pd.to_datetime(df["end"])
+    return df
 
 def save_schedule(df):
     df.to_excel(SCHEDULE_XLSX, index=False)
@@ -95,10 +99,13 @@ def schedule_reminders(patient, appt_start_iso, doctor, location):
     plan = [
         ("Appointment Confirmation", datetime.now(),
          f"Your appointment with {doctor} at {location} is confirmed for {t0.strftime('%Y-%m-%d %H:%M')}."),
+
         ("Reminder 72h", t0 - timedelta(hours=72),
          f"Reminder: Appointment with {doctor} at {location} on {t0.strftime('%Y-%m-%d %H:%M')}."),
+
         ("Reminder 24h", t0 - timedelta(hours=24),
          f"Please confirm and complete forms. Appointment with {doctor} at {location} on {t0.strftime('%Y-%m-%d %H:%M')}."),
+
         ("Reminder 2h", t0 - timedelta(hours=2),
          f"Final reminder: Appointment with {doctor} at {location} at {t0.strftime('%Y-%m-%d %H:%M')}. Reply YES to confirm."),
     ]
@@ -128,6 +135,7 @@ def find_or_create_patient(name, dob, email, phone, insurance_carrier, insurance
 
 def book_appointment(patient, doctor, date_str, time_str, duration_minutes=30):
     schedule = load_schedule()
+
     date_obj = dateparser.parse(date_str).date()
     time_obj = dateparser.parse(time_str).time()
     start_dt = datetime.combine(date_obj, time_obj)
@@ -136,7 +144,7 @@ def book_appointment(patient, doctor, date_str, time_str, duration_minutes=30):
     mask = (
         (schedule["doctor"] == doctor) &
         (schedule["booked"] == False) &
-        (schedule["start"] == start_dt.isoformat())
+        (schedule["start"] == start_dt)   # compare as datetime
     )
     if not mask.any():
         return None  # slot not free
@@ -171,8 +179,8 @@ with st.form("appointment_form"):
     insurance_group = st.text_input("Insurance Group", placeholder="e.g., A1,A2")
 
     st.subheader("📅 Appointment Request")
-    doctor = st.selectbox("Select Doctor", ["Dr. Shyam", "Dr. John", "Dr. Mehta"])
-    date_str = st.text_input("Preferred Date", placeholder="e.g., 2025-09-05")
+    doctor = st.selectbox("Select Doctor", ["Dr. Rao", "Dr. Iyer", "Dr. Mehta"])
+    date_str = st.text_input("Preferred Date", placeholder="e.g., 2025-09-22")
     time_str = st.text_input("Preferred Time (HH:MM)", placeholder="e.g., 09:00")
     duration = st.selectbox("Appointment Duration", [30, 60], index=0)
 
